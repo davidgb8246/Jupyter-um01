@@ -15,7 +15,7 @@ Esta configuración está diseñada para ser un "todo en uno" que incluye:
 
 ## 🚀 Inicio Rápido (Docker Hub)
 
-No necesitas construir la imagen localmente. Ya se encuentra disponible en **Docker Hub** como `davidgb8246/jupyter-um01`.
+No necesitas construir la imagen localmente. Ya se encuentra disponible en **Docker Hub** como [`davidgb8246/jupyter-um01`](https://hub.docker.com/repository/docker/davidgb8246/jupyter-um01/).
 
 ### Comando de Despliegue Recomendado
 
