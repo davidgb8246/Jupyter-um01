@@ -92,3 +92,19 @@ docker build -t mi-jupyter-personalizado .
 ```bash
 docker run -d --rm -p 8888:8888 -v $(pwd)/mi_trabajo:/home/jupyter/work mi-jupyter-personalizado
 ```
+
+---
+
+## 👥 Contribuidores
+
+Este proyecto ha sido desarrollado y es mantenido por:
+
+* **David G.B.** - [davidgb8246](https://github.com/davidgb8246)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la **Licencia MIT**, lo que significa que es de libre uso, copia y distribución, tanto para fines académicos como personales.
+
+Consulta el archivo [LICENSE](LICENSE) para más detalles (o visita [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)).
