@@ -66,21 +66,4 @@ WORKDIR /home/jupyter/work
 # -----------------------------
 # Start JupyterLab
 # -----------------------------
-CMD ["bash", "-c", "\
-if [ -n \"$JUPYTER_PASSWD\" ]; then \
-  HASHED_PASSWORD=$(conda run -n sage sage --python -c \"from notebook.auth import passwd; print(passwd('$JUPYTER_PASSWD'))\"); \
-  exec conda run --no-capture-output -n sage sage --python -m jupyterlab \
-    --ip=0.0.0.0 \
-    --no-browser \
-    --allow-root \
-    --NotebookApp.password=$HASHED_PASSWORD \
-    --notebook-dir=/home/jupyter/work; \
-else \
-  exec conda run --no-capture-output -n sage sage --python -m jupyterlab \
-    --ip=0.0.0.0 \
-    --no-browser \
-    --allow-root \
-    --NotebookApp.token= \
-    --NotebookApp.password= \
-    --notebook-dir=/home/jupyter/work; \
-fi"]
+CMD ["bash","-c","if [ -n \"$JUPYTER_PASSWD\" ]; then HASHED_PASSWORD=$(conda run -n sage sage -python -c \"from jupyter_server.auth import passwd; print(passwd('$JUPYTER_PASSWD'))\"); exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.password=$HASHED_PASSWORD --notebook-dir=/home/jupyter/work; else exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.token= --ServerApp.password= --notebook-dir=/home/jupyter/work; fi"]
