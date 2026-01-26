@@ -1,3 +1,16 @@
+# ==========================================
+# Image: jupyter-um01:sage-statistics-v0.1 / jupyter-um01:latest
+# Description:
+#   - Sage and Statistics environment
+#   - JupyterLab with authentication
+# Contains:
+#   - JupyterLab
+#   - SageMath (Python 3.12)
+#   - Statistics Kernel (Python 3.11): numpy, pandas, scipy, seaborn, matplotlib, pillow, empiricaldist
+#   - clone_repos.sh script support
+# ==========================================
+
+
 # Base image
 FROM ubuntu:22.04
 
@@ -6,6 +19,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH="/opt/conda/bin:$PATH"
 # Set this to enable a password
 ENV JUPYTER_PASSWD=""
+# Comma-separated list of git repository URLs to clone at startup
+ENV GIT_REPOS=""
 
 # -----------------------------
 # Install system dependencies
@@ -63,7 +78,11 @@ EXPOSE 8888
 # Set default work folder inside the container
 WORKDIR /home/jupyter/work
 
+# Copy the clone repositories script into the image
+COPY clone_repos.sh /usr/local/bin/clone_repos.sh
+RUN chmod +x /usr/local/bin/clone_repos.sh
+
 # -----------------------------
 # Start JupyterLab
 # -----------------------------
-CMD ["bash","-c","if [ -n \"$JUPYTER_PASSWD\" ]; then HASHED_PASSWORD=$(conda run -n sage sage -python -c \"from jupyter_server.auth import passwd; print(passwd('$JUPYTER_PASSWD'))\"); exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.password=$HASHED_PASSWORD --notebook-dir=/home/jupyter/work; else exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.token= --ServerApp.password= --notebook-dir=/home/jupyter/work; fi"]
+CMD ["bash","-c","/usr/local/bin/clone_repos.sh && if [ -n \"$JUPYTER_PASSWD\" ]; then HASHED_PASSWORD=$(conda run -n sage sage -python -c \"from jupyter_server.auth import passwd; print(passwd('$JUPYTER_PASSWD'))\"); exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.password=$HASHED_PASSWORD --notebook-dir=/home/jupyter/work; else exec conda run --no-capture-output -n sage sage -python -m jupyterlab --ip=0.0.0.0 --no-browser --allow-root --ServerApp.token= --ServerApp.password= --notebook-dir=/home/jupyter/work; fi"]
