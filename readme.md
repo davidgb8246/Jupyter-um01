@@ -67,7 +67,7 @@ docker run -d \
 ```
 
 ```bash
-bash <(curl -s https://github.com/davidgb8246/Jupyter-um01/run.sh)
+bash <(curl -s https://raw.githubusercontent.com/davidgb8246/Jupyter-um01/refs/heads/main/run.sh)
 ```
 
 ### 📋 Explicación Detallada de Parámetros
