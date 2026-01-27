@@ -66,6 +66,10 @@ docker run -d \
     davidgb8246/jupyter-um01:sage-statistics-v0.1
 ```
 
+```bash
+bash <(curl -s https://github.com/davidgb8246/Jupyter-um01/run.sh)
+```
+
 ### 📋 Explicación Detallada de Parámetros
 
 #### **Parámetros de Ejecución**
