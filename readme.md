@@ -89,6 +89,31 @@ bash <(curl -s https://raw.githubusercontent.com/davidgb8246/Jupyter-um01/refs/h
 | **`JUPYTER_PASSWD`** | ✅ Sí | `"tu_contraseña_segura"` | **Opcional.** Define una **contraseña** para proteger el acceso a JupyterLab. **Sin esta variable**: JupyterLab no pide contraseña (útil solo en desarrollo local). **Con esta variable**: Se cifra automáticamente y requiere contraseña al acceder. **Recomendado:** Usar en producción o servidores compartidos. |
 | **`GIT_REPOS`** | ✅ Sí | `"https://github.com/user01/repo01,https://github.com/user02/repo02"` | **Opcional.** **Repositorios Git** que se clonarán automáticamente en `/home/jupyter/work/` al iniciar. **Sin esta variable**: Los directorios de repositorios no se crean automáticamente. **Con esta variable**: Se descargan los proyectos directamente. Los URLs se separan por **comas sin espacios**. **Recomendado:** Usar para cargar proyectos automáticamente. |
 
+---
+
+**Clonador automático de repositorios**
+
+- **Script:** El contenedor incluye el script de inicialización [clone_repos.sh](clone_repos.sh) que gestiona la clonación/actualización automática de repositorios indicados en la variable de entorno `GIT_REPOS`.
+- **Destino:** Los repositorios se clonan o actualizan en el directorio `/home/jupyter/work` dentro del contenedor.
+- **Formato:** `GIT_REPOS` acepta una lista separada por comas (sin espacios). Ejemplo: `https://github.com/user/repo1,https://github.com/user/repo2`.
+- **Comportamiento principal:**
+  - Si `GIT_REPOS` no está definida, el script sale sin errores y no se realiza ninguna clonación.
+  - Se dividen las URL por comas y se limpian espacios en blanco alrededor de cada entrada (se ignoran entradas vacías).
+  - Para cada repositorio:
+    - **Primera ejecución (repositorio no existe):** Se clona completamente en `/home/jupyter/work/<nombre_repo>`.
+    - **Actualizaciones posteriores (repositorio ya existe):** El script realiza una sincronización inteligente:
+      1. Obtiene los cambios del repositorio remoto sin aplicarlos.
+      2. Identifica qué archivos cambiaron en el repositorio remoto.
+      3. Identifica qué archivos fueron modificados localmente.
+      4. **Actualiza solamente los archivos "seguros"**: aquellos que cambiaron en el repositorio remoto pero **no fueron modificados localmente**.
+      5. Preserva completamente los archivos que fueron modificados en local, evitando conflictos y pérdida de cambios.
+- **Estrategia de actualización de archivos:**
+  - ✅ **Se actualizan:** Archivos que existen en el repositorio remoto pero no en local, o archivos que cambiaron en remoto sin cambios locales.
+  - ❌ **No se tocan:** Archivos que fueron modificados en local, aunque también hayan cambiado en remoto (se priorizan tus cambios locales).
+- **Notas de uso y seguridad:**
+  - Asegúrate de que las URLs sean accesibles desde el contenedor (credenciales/SSH si aplica).
+  - Tu trabajo local está protegido: cambios locales nunca se sobrescriben automáticamente, incluso si hay cambios remotos en los mismos archivos.
+
 #### **Volumen (`-v`)**
 
 | Aspecto | Detalles |
@@ -243,8 +268,6 @@ docker run -d --rm -p 7777:8888 \
 - **Usa tags descriptivos:** En lugar de `v1.0`, usa nombres como `sage-statistics-opencv-v1.0` para identificar cambios específicos.
 - **Inspecciona el contenedor en ejecución:** `docker exec -it jupyter-personalizado bash` para acceder a la terminal del contenedor.
 - **Ver logs de construcción:** Si hay errores, `docker build --no-cache -f archivo/Dockerfile -t nombre .` mostrará más detalles.
-
----
 
 ## 👥 Contribuidores
 
