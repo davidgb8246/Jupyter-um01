@@ -1,0 +1,36 @@
+name: Deploy multi GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy sage
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages-sage
+          publish_dir: sage
+          cname: sage-um01.davidgb.net
+
+      - name: Deploy sage-statistics
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages-sage-statistics
+          publish_dir: sage-statistics
+          cname: sage-statistics-um01.davidgb.net
+
+      - name: Deploy statistics
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages-statistics
+          publish_dir: statistics
+          cname: statistics-um01.davidgb.net
