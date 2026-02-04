@@ -68,22 +68,55 @@ docker run -d \
 
 #### Despliegue Automatizado por Rama
 
-O ejecuta directamente el script de despliegue de cada rama:
+Ejecuta directamente el script de despliegue de cada rama. Los scripts permiten parametrización completa de la ejecución para personalizar el puerto, nombre del contenedor y repositorios Git a clonar.
+
+**Parámetros Disponibles:**
+
+| Parámetro | Tipo | Por Defecto | Descripción |
+|-----------|------|-------------|-------------|
+| `APP_PORT` | Número | `7777` | Puerto local en el que se ejecutará JupyterLab. Debe estar disponible en tu sistema. |
+| `CONTAINER_NAME` | Texto | Varía por rama | Nombre identificable del contenedor Docker (sage: `jupyter-sage`, statistics: `jupyter-stats`, sage-statistics: `jupyter-sage-statistics`). |
+| `GIT_REPOS` | URL/URLs | Vacío (opcional) | Repositorio(s) Git a clonar automáticamente en `/home/jupyter/work`. Múltiples repos separados por comas sin espacios. Ejemplo: `https://github.com/user/repo1,https://github.com/user/repo2` |
 
 **Rama SageMath:**
 ```bash
-bash <(curl -fsSL https://jupyter-um01.davidgb.net/sage/run.sh)
+curl -fsSL https://jupyter-um01.davidgb.net/sage/run.sh | bash
 ```
+
+Con parámetros personalizados:
+```bash
+curl -fsSL https://jupyter-um01.davidgb.net/sage/run.sh | APP_PORT=8888 CONTAINER_NAME=mi-sage GIT_REPOS="https://github.com/usuario/repo" bash
+```
+
+---
 
 **Rama Estadística:**
 ```bash
-bash <(curl -fsSL https://jupyter-um01.davidgb.net/statistics/run.sh)
+curl -fsSL https://jupyter-um01.davidgb.net/statistics/run.sh | bash
 ```
+
+Con parámetros personalizados:
+```bash
+curl -fsSL https://jupyter-um01.davidgb.net/statistics/run.sh | APP_PORT=8888 CONTAINER_NAME=mi-stats GIT_REPOS="https://github.com/usuario/repo" bash
+```
+
+---
 
 **Rama SageMath + Estadística (Completa):**
 ```bash
-bash <(curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh)
+curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | bash
 ```
+
+Con parámetros personalizados:
+```bash
+curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | APP_PORT=8888 CONTAINER_NAME=mi-jupyter GIT_REPOS="https://github.com/user/repo1,https://github.com/user/repo2" bash
+```
+
+**Notas sobre los scripts:**
+- Los scripts crean automáticamente el directorio de trabajo `mi_trabajo` en el directorio actual si no existe.
+- El contenedor se ejecuta con la flag `--rm`, lo que significa que se limpia automáticamente al detenerlo.
+- Al iniciar, los scripts esperan a que JupyterLab esté disponible (máximo 15 intentos con 2 segundos entre intentos).
+- Se mostrarán todas las direcciones disponibles para acceder a JupyterLab (localhost, 127.0.0.1 y direcciones IP locales si aplica).
 
 ### 📋 Explicación Detallada de Parámetros
 
