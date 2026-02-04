@@ -66,8 +66,23 @@ docker run -d \
     davidgb8246/jupyter-um01:sage-statistics-v0.1
 ```
 
+#### Despliegue Automatizado por Rama
+
+O ejecuta directamente el script de despliegue de cada rama:
+
+**Rama SageMath:**
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/davidgb8246/Jupyter-um01/refs/heads/main/run.sh)
+bash <(curl -fsSL https://jupyter-um01.davidgb.net/sage/run.sh)
+```
+
+**Rama Estadística:**
+```bash
+bash <(curl -fsSL https://jupyter-um01.davidgb.net/statistics/run.sh)
+```
+
+**Rama SageMath + Estadística (Completa):**
+```bash
+bash <(curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh)
 ```
 
 ### 📋 Explicación Detallada de Parámetros
