@@ -49,7 +49,7 @@ Basado en **Python 3.11**, incluye:
 
 ## 🚀 Inicio Rápido (Docker Hub)
 
-No necesitas construir la imagen localmente. Las imágenes ya se encuentran disponibles en **Docker Hub** como [`davidgb8246/jupyter-um01`](https://hub.docker.com/repository/docker/davidgb8246/jupyter-um01/).
+No necesitas construir la imagen localmente. Las imágenes ya se encuentran disponibles en **Docker Hub** como [`davidgb8246/jupyter-um01`](https://hub.docker.com/r/davidgb8246/jupyter-um01/).
 
 ### Comando de Despliegue Recomendado (Ejemplo: Rama `sage-statistics`)
 
