@@ -15,19 +15,19 @@ El proyecto cuenta con **3 ramas especializadas**, cada una optimizada para dife
 ### 1. **Rama `sage`** 📐
 Contiene únicamente el entorno de **SageMath**. Ideal para cálculo algebraico y matemático avanzado.
 
-- **Imagen Docker:** [`davidgb8246/jupyter-um01:sage-v0.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/sage-v0.1/)
+- **Imagen Docker:** [`davidgb8246/jupyter-um01:sage-v0.1.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/sage-v0.1.1/)
 - **Tamaño:** Reducido, solo dependencias matemáticas
 
 ### 2. **Rama `statistics`** 📊
 Contiene únicamente el entorno de **Estadística**. Perfecto para análisis de datos y visualizaciones estadísticas.
 
-- **Imagen Docker:** [`davidgb8246/jupyter-um01:statistics-v0.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/statistics-v0.1/)
+- **Imagen Docker:** [`davidgb8246/jupyter-um01:statistics-v0.1.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/statistics-v0.1.1/)
 - **Tamaño:** Ligero, enfocado en análisis de datos
 
 ### 3. **Rama `sage-statistics`** 🔀
 Contiene **ambos entornos integrados**: SageMath y Estadística. Es la solución completa "todo en uno".
 
-- **Imagen Docker:** [`davidgb8246/jupyter-um01:sage-statistics-v0.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/sage-statistics-v0.1/) (o [`latest`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/latest/))
+- **Imagen Docker:** [`davidgb8246/jupyter-um01:sage-statistics-v0.1.1`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/sage-statistics-v0.1.1/) (o [`latest`](https://hub.docker.com/layers/davidgb8246/jupyter-um01/latest/))
 - **Tamaño:** Completo, con todas las herramientas
 
 ## 🎞️ ¿Qué incluye cada imagen?
@@ -63,7 +63,7 @@ docker run -d \
     -e GIT_REPOS="https://github.com/user01/repo01" \
     -v $(pwd)/mi_trabajo:/home/jupyter/work \
     --name jupyter-um01 \
-    davidgb8246/jupyter-um01:sage-statistics-v0.1
+    davidgb8246/jupyter-um01:sage-statistics-v0.1.1
 ```
 
 #### Despliegue Automatizado por Rama
@@ -128,7 +128,7 @@ curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | APP_PORT=88
 | **`--rm`** | ✅ Sí | — | **Elimina automáticamente** el contenedor al detenerlo. **Sin `--rm`**: El contenedor permanece en tu sistema consumiendo espacio. **Con `--rm`**: Se limpia automáticamente. **Recomendado:** Usar para desarrollo iterativo y mantener limpio el sistema. |
 | **`-p 7777:8888`** | ❌ No | `7777` → `8888` | **Mapeo de puertos**: Conecta tu máquina local con el contenedor. `7777` es tu puerto local, `8888` el del contenedor. **Sin `-p`**: JupyterLab no será accesible desde tu navegador. **Con `-p`**: Accedes a través de [`http://localhost:7777`](http://localhost:7777). Puedes usar cualquier puerto disponible en lugar de `7777`. |
 | **`--name`** | ✅ Sí | `jupyter-um01` | **Nombre identificable** del contenedor. **Sin `--name`**: Docker asigna un nombre aleatorio. **Con `--name`**: Fácil de gestionar con `docker stop jupyter-um01` o `docker logs jupyter-um01`. **Recomendado:** Facilita la administración. |
-| **Imagen** | ❌ No | `davidgb8246/jupyter-um01:sage-statistics-v0.1` | **Obligatorio.** Especifica cuál imagen y versión usar: `sage-vX.X`, `statistics-vX.X`, `sage-statistics-vX.X`, o `latest`. Debe ser el último parámetro del comando. |
+| **Imagen** | ❌ No | `davidgb8246/jupyter-um01:sage-statistics-v0.1.1` | **Obligatorio.** Especifica cuál imagen y versión usar: `sage-vX.X`, `statistics-vX.X`, `sage-statistics-vX.X`, o `latest`. Debe ser el último parámetro del comando. |
 
 #### **Variables de Entorno (`-e`)**
 
@@ -141,26 +141,37 @@ curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | APP_PORT=88
 
 **Clonador automático de repositorios**
 
-- **Script:** El contenedor incluye el script de inicialización [clone_repos.sh](clone_repos.sh) que gestiona la clonación/actualización automática de repositorios indicados en la variable de entorno `GIT_REPOS`.
+- **Script:** El contenedor incluye el script de inicialización [clone_repos.sh](clone_repos.sh) que gestiona la clonación y actualización automática de repositorios indicados en la variable de entorno `GIT_REPOS`.
 - **Destino:** Los repositorios se clonan o actualizan en el directorio `/home/jupyter/work` dentro del contenedor.
 - **Formato:** `GIT_REPOS` acepta una lista separada por comas (sin espacios). Ejemplo: `https://github.com/user/repo1,https://github.com/user/repo2`.
 - **Comportamiento principal:**
   - Si `GIT_REPOS` no está definida, el script sale sin errores y no se realiza ninguna clonación.
   - Se dividen las URL por comas y se limpian espacios en blanco alrededor de cada entrada (se ignoran entradas vacías).
   - Para cada repositorio:
-    - **Primera ejecución (repositorio no existe):** Se clona completamente en `/home/jupyter/work/<nombre_repo>`.
-    - **Actualizaciones posteriores (repositorio ya existe):** El script realiza una sincronización inteligente:
-      1. Obtiene los cambios del repositorio remoto sin aplicarlos.
-      2. Identifica qué archivos cambiaron en el repositorio remoto.
-      3. Identifica qué archivos fueron modificados localmente.
-      4. **Actualiza solamente los archivos "seguros"**: aquellos que cambiaron en el repositorio remoto pero **no fueron modificados localmente**.
-      5. Preserva completamente los archivos que fueron modificados en local, evitando conflictos y pérdida de cambios.
+    - **Primera ejecución (repositorio no existe):** Se clona completamente en `/home/jupyter/work/<nombre_repo>` y todos los archivos se registran como gestionados por el script en el archivo `.sync_state`.
+    - **Actualizaciones posteriores (repositorio ya existe):** El script realiza una **sincronización inteligente**:
+      1. Verifica si hay cambios en el repositorio remoto comparando commits locales y remotos.
+      2. Si hay cambios, crea una **copia temporal del repositorio remoto** para obtener el estado actualizado de todos los archivos.
+      3. Compara archivos locales con los de la copia temporal:
+         - Archivos **existentes en remoto pero modificados localmente** se preservan (no se sobrescriben).
+         - Archivos **existentes en remoto y no modificados localmente** se actualizan automáticamente.
+         - Archivos **nuevos en remoto** se agregan y se registran en `.sync_state`.
+         - Archivos **eliminados en remoto** se eliminan localmente **solo si no han sido modificados por el usuario**; los archivos locales modificados se preservan.
+      4. Los archivos `.git` se actualizan siempre para mantener la metadata del repositorio sincronizada, pero **nunca se registran en `.sync_state`**.
+      5. Los archivos de usuario que no están gestionados por el script se preservan completamente, incluso si fueron eliminados o modificados en remoto.
+
 - **Estrategia de actualización de archivos:**
-  - ✅ **Se actualizan:** Archivos que existen en el repositorio remoto pero no en local, o archivos que cambiaron en remoto sin cambios locales.
-  - ❌ **No se tocan:** Archivos que fueron modificados en local, aunque también hayan cambiado en remoto (se priorizan tus cambios locales).
+  - ✅ **Se actualizan automáticamente:**
+    - Archivos nuevos o modificados en remoto que **no fueron modificados localmente**.
+    - Archivos dentro de `.git` para mantener la metadata del repositorio actualizada.
+  - ❌ **No se tocan:**
+    - Archivos modificados localmente por el usuario, incluso si también cambiaron en remoto.
+    - Archivos no gestionados por el script (sin registro en `.sync_state`).
+
 - **Notas de uso y seguridad:**
   - Asegúrate de que las URLs sean accesibles desde el contenedor (credenciales/SSH si aplica).
-  - Tu trabajo local está protegido: cambios locales nunca se sobrescriben automáticamente, incluso si hay cambios remotos en los mismos archivos.
+  - Tu trabajo local está protegido: los cambios locales **nunca se sobrescriben automáticamente**.
+  - El archivo `.sync_state` registra los archivos gestionados por el script y su última actualización, permitiendo un control preciso de qué archivos pueden actualizarse o eliminarse de forma segura.
 
 #### **Volumen (`-v`)**
 
@@ -181,13 +192,13 @@ Reemplaza el tag de imagen según necesites:
 
 ```bash
 # Solo SageMath
-davidgb8246/jupyter-um01:sage-v0.1
+davidgb8246/jupyter-um01:sage-v0.1.1
 
 # Solo Estadística  
-davidgb8246/jupyter-um01:statistics-v0.1
+davidgb8246/jupyter-um01:statistics-v0.1.1
 
 # Ambos (SageMath + Estadística)
-davidgb8246/jupyter-um01:sage-statistics-v0.1
+davidgb8246/jupyter-um01:sage-statistics-v0.1.1
 # o simplemente:
 davidgb8246/jupyter-um01:latest
 ```

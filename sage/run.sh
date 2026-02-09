@@ -12,7 +12,7 @@ CONTAINER_NAME="${CONTAINER_NAME:-jupyter-sage}"
 MAX_RETRIES=15
 RETRY_DELAY=2
 JUPYTER_URL="http://localhost:${APP_PORT}"
-IMAGE_TAG="sage-v0.1"
+IMAGE_TAG="sage-v0.1.1"
 WORK_DIR="$(pwd)/mi_trabajo"
 
 [ -d "$WORK_DIR" ] || mkdir -p "$WORK_DIR" || exit 15
