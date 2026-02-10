@@ -66,7 +66,70 @@ docker run -d \
     davidgb8246/jupyter-um01:sage-statistics-v0.1.1
 ```
 
-#### Despliegue Automatizado por Rama
+### 📋 Explicación Detallada de Parámetros
+
+#### **Parámetros de Ejecución**
+
+| Parámetro | Opcional | Valor Ejemplo | Descripción |
+|-----------|----------|--------------|-------------|
+| **`-d`** | ✅ Sí | — | Ejecuta el contenedor en **modo desatendido (detached)**. **Sin `-d`**: El contenedor bloquea la terminal hasta que se detenga. **Con `-d`**: Funciona en segundo plano. **Recomendado:** Siempre usar para no bloquear la terminal. |
+| **`--rm`** | ✅ Sí | — | **Elimina automáticamente** el contenedor al detenerlo. **Sin `--rm`**: El contenedor permanece en tu sistema consumiendo espacio. **Con `--rm`**: Se limpia automáticamente. **Recomendado:** Usar para desarrollo iterativo y mantener limpio el sistema. |
+| **`-p 7777:8888`** | ❌ No | `7777` → `8888` | **Mapeo de puertos**: Conecta tu máquina local con el contenedor. `7777` es tu puerto local, `8888` el del contenedor. **Sin `-p`**: JupyterLab no será accesible desde tu navegador. **Con `-p`**: Accedes a través de [`http://localhost:7777`](http://localhost:7777). Puedes usar cualquier puerto disponible en lugar de `7777`. |
+| **`--name`** | ✅ Sí | `jupyter-um01` | **Nombre identificable** del contenedor. **Sin `--name`**: Docker asigna un nombre aleatorio. **Con `--name`**: Fácil de gestionar con `docker stop jupyter-um01` o `docker logs jupyter-um01`. **Recomendado:** Facilita la administración. |
+| **Imagen** | ❌ No | `davidgb8246/jupyter-um01:sage-statistics-v0.1.1` | **Obligatorio.** Especifica cuál imagen y versión usar: `sage-vX.X`, `statistics-vX.X`, `sage-statistics-vX.X`, o `latest`. Debe ser el último parámetro del comando. |
+
+#### **Variables de Entorno (`-e`)**
+
+| Variable | Opcional | Valor Ejemplo | Descripción |
+|----------|----------|--------------|-------------|
+| **`JUPYTER_PASSWD`** | ✅ Sí | `"tu_contraseña_segura"` | **Opcional.** Define una **contraseña** para proteger el acceso a JupyterLab. **Sin esta variable**: JupyterLab no pide contraseña (útil solo en desarrollo local). **Con esta variable**: Se cifra automáticamente y requiere contraseña al acceder. **Recomendado:** Usar en producción o servidores compartidos. |
+| **`GIT_REPOS`** | ✅ Sí | `"https://github.com/user01/repo01,https://github.com/user02/repo02"` | **Opcional.** **Repositorios Git** que se clonarán automáticamente en `/home/jupyter/work/` al iniciar. **Sin esta variable**: Los directorios de repositorios no se crean automáticamente. **Con esta variable**: Se descargan los proyectos directamente. Los URLs se separan por **comas sin espacios**. **Recomendado:** Usar para cargar proyectos automáticamente. |
+
+---
+
+#### **Volumen (`-v`)**
+
+| Aspecto | Detalles |
+|--------|----------|
+| **Propósito** | Sincroniza directorios entre tu máquina local y el contenedor. Ambos "ven" los mismos archivos en tiempo real. |
+| **Sintaxis** | `-v ruta-local:ruta-contenedor` (separa ambas rutas con `:`) |
+| **Opcional** | ✅ Sí. **Sin `-v`**: Los archivos dentro del contenedor se pierden al detenerlo. **Con `-v`**: Los datos persisten en tu máquina local. **Recomendado:** Siempre usar para proteger tu trabajo. |
+| **Ruta Local** | `$(pwd)/mi_trabajo` — Tu computadora. `$(pwd)` es el directorio actual. En Windows PowerShell usa: `${PWD}\mi_trabajo`. **Variantes:** Rutas absolutas como `/home/usuario/datos` o `C:\Users\Usuario\datos` |
+| **Ruta Contenedor** | `/home/jupyter/work` — Dentro del contenedor. Es donde aparecen los archivos para JupyterLab. |
+| **Sincronización** | **Bidireccional:** Los cambios en tu carpeta local se reflejan en el contenedor y viceversa. Archivos creados en JupyterLab aparecen en tu carpeta local. |
+| **Persistencia** | **Total:** Aunque elimines el contenedor (`--rm`), los archivos en tu máquina local permanecen intactos. |
+| **Ejemplos** | `-v /home/usuario/datos:/home/jupyter/work` **o** `-v C:\datos:/home/jupyter/work` — Carpeta `C:\datos` accesible como `/home/jupyter/work` en el contenedor. |
+
+#### **Selección de Rama/Imagen**
+
+Reemplaza el tag de imagen según necesites:
+
+```bash
+# Solo SageMath
+davidgb8246/jupyter-um01:sage-v0.1.1
+
+# Solo Estadística  
+davidgb8246/jupyter-um01:statistics-v0.1.1
+
+# Ambos (SageMath + Estadística)
+davidgb8246/jupyter-um01:sage-statistics-v0.1.1
+# o simplemente:
+davidgb8246/jupyter-um01:latest
+```
+
+#### **Acceso a JupyterLab**
+
+Una vez ejecutado el comando anterior, abre tu navegador web y dirígete a:
+
+```
+http://localhost:7777
+```
+
+> **Nota:** Si usaste `JUPYTER_PASSWD="your_secure_password"`, ingresa esa contraseña en la pantalla de autenticación.
+
+---
+
+### Despliegue Automatizado por Rama
 
 Ejecuta directamente el script de despliegue de cada rama. Los scripts permiten parametrización completa de la ejecución para personalizar el puerto, nombre del contenedor y repositorios Git a clonar.
 
@@ -119,28 +182,7 @@ curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | APP_PORT=88
 - Al iniciar, los scripts esperan a que JupyterLab esté disponible (máximo 15 intentos con 2 segundos entre intentos).
 - Se mostrarán todas las direcciones disponibles para acceder a JupyterLab (localhost, 127.0.0.1 y direcciones IP locales si aplica).
 
-### 📋 Explicación Detallada de Parámetros
-
-#### **Parámetros de Ejecución**
-
-| Parámetro | Opcional | Valor Ejemplo | Descripción |
-|-----------|----------|--------------|-------------|
-| **`-d`** | ✅ Sí | — | Ejecuta el contenedor en **modo desatendido (detached)**. **Sin `-d`**: El contenedor bloquea la terminal hasta que se detenga. **Con `-d`**: Funciona en segundo plano. **Recomendado:** Siempre usar para no bloquear la terminal. |
-| **`--rm`** | ✅ Sí | — | **Elimina automáticamente** el contenedor al detenerlo. **Sin `--rm`**: El contenedor permanece en tu sistema consumiendo espacio. **Con `--rm`**: Se limpia automáticamente. **Recomendado:** Usar para desarrollo iterativo y mantener limpio el sistema. |
-| **`-p 7777:8888`** | ❌ No | `7777` → `8888` | **Mapeo de puertos**: Conecta tu máquina local con el contenedor. `7777` es tu puerto local, `8888` el del contenedor. **Sin `-p`**: JupyterLab no será accesible desde tu navegador. **Con `-p`**: Accedes a través de [`http://localhost:7777`](http://localhost:7777). Puedes usar cualquier puerto disponible en lugar de `7777`. |
-| **`--name`** | ✅ Sí | `jupyter-um01` | **Nombre identificable** del contenedor. **Sin `--name`**: Docker asigna un nombre aleatorio. **Con `--name`**: Fácil de gestionar con `docker stop jupyter-um01` o `docker logs jupyter-um01`. **Recomendado:** Facilita la administración. |
-| **Imagen** | ❌ No | `davidgb8246/jupyter-um01:sage-statistics-v0.1.1` | **Obligatorio.** Especifica cuál imagen y versión usar: `sage-vX.X`, `statistics-vX.X`, `sage-statistics-vX.X`, o `latest`. Debe ser el último parámetro del comando. |
-
-#### **Variables de Entorno (`-e`)**
-
-| Variable | Opcional | Valor Ejemplo | Descripción |
-|----------|----------|--------------|-------------|
-| **`JUPYTER_PASSWD`** | ✅ Sí | `"tu_contraseña_segura"` | **Opcional.** Define una **contraseña** para proteger el acceso a JupyterLab. **Sin esta variable**: JupyterLab no pide contraseña (útil solo en desarrollo local). **Con esta variable**: Se cifra automáticamente y requiere contraseña al acceder. **Recomendado:** Usar en producción o servidores compartidos. |
-| **`GIT_REPOS`** | ✅ Sí | `"https://github.com/user01/repo01,https://github.com/user02/repo02"` | **Opcional.** **Repositorios Git** que se clonarán automáticamente en `/home/jupyter/work/` al iniciar. **Sin esta variable**: Los directorios de repositorios no se crean automáticamente. **Con esta variable**: Se descargan los proyectos directamente. Los URLs se separan por **comas sin espacios**. **Recomendado:** Usar para cargar proyectos automáticamente. |
-
----
-
-**Clonador automático de repositorios**
+### **Clonador automático de repositorios**
 
 - **Script:** El contenedor incluye el script de inicialización [clone_repos.sh](clone_repos.sh) que gestiona la clonación y actualización automática de repositorios indicados en la variable de entorno `GIT_REPOS`.
 - **Destino:** Los repositorios se clonan o actualizan en el directorio `/home/jupyter/work` dentro del contenedor.
@@ -173,46 +215,6 @@ curl -fsSL https://jupyter-um01.davidgb.net/sage-statistics/run.sh | APP_PORT=88
   - Asegúrate de que las URLs sean accesibles desde el contenedor (credenciales/SSH si aplica).
   - Tu trabajo local está protegido: los cambios locales **nunca se sobrescriben automáticamente**.
   - El archivo `.sync_state` registra los archivos gestionados por el script y su última actualización, permitiendo un control preciso de qué archivos pueden actualizarse o eliminarse de forma segura.
-
-#### **Volumen (`-v`)**
-
-| Aspecto | Detalles |
-|--------|----------|
-| **Propósito** | Sincroniza directorios entre tu máquina local y el contenedor. Ambos "ven" los mismos archivos en tiempo real. |
-| **Sintaxis** | `-v ruta-local:ruta-contenedor` (separa ambas rutas con `:`) |
-| **Opcional** | ✅ Sí. **Sin `-v`**: Los archivos dentro del contenedor se pierden al detenerlo. **Con `-v`**: Los datos persisten en tu máquina local. **Recomendado:** Siempre usar para proteger tu trabajo. |
-| **Ruta Local** | `$(pwd)/mi_trabajo` — Tu computadora. `$(pwd)` es el directorio actual. En Windows PowerShell usa: `${PWD}\mi_trabajo`. **Variantes:** Rutas absolutas como `/home/usuario/datos` o `C:\Users\Usuario\datos` |
-| **Ruta Contenedor** | `/home/jupyter/work` — Dentro del contenedor. Es donde aparecen los archivos para JupyterLab. |
-| **Sincronización** | **Bidireccional:** Los cambios en tu carpeta local se reflejan en el contenedor y viceversa. Archivos creados en JupyterLab aparecen en tu carpeta local. |
-| **Persistencia** | **Total:** Aunque elimines el contenedor (`--rm`), los archivos en tu máquina local permanecen intactos. |
-| **Ejemplos** | `-v /home/usuario/datos:/home/jupyter/work` **o** `-v C:\datos:/home/jupyter/work` — Carpeta `C:\datos` accesible como `/home/jupyter/work` en el contenedor. |
-
-#### **Selección de Rama/Imagen**
-
-Reemplaza el tag de imagen según necesites:
-
-```bash
-# Solo SageMath
-davidgb8246/jupyter-um01:sage-v0.1.1
-
-# Solo Estadística  
-davidgb8246/jupyter-um01:statistics-v0.1.1
-
-# Ambos (SageMath + Estadística)
-davidgb8246/jupyter-um01:sage-statistics-v0.1.1
-# o simplemente:
-davidgb8246/jupyter-um01:latest
-```
-
-#### **Acceso a JupyterLab**
-
-Una vez ejecutado el comando anterior, abre tu navegador web y dirígete a:
-
-```
-http://localhost:7777
-```
-
-> **Nota:** Si usaste `JUPYTER_PASSWD="your_secure_password"`, ingresa esa contraseña en la pantalla de autenticación.
 
 ---
 
