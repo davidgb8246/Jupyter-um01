@@ -77,6 +77,7 @@ Ejecuta directamente el script de despliegue de cada rama. Los scripts permiten 
 | `APP_PORT` | Número | `7777` | Puerto local en el que se ejecutará JupyterLab. Debe estar disponible en tu sistema. |
 | `CONTAINER_NAME` | Texto | Varía por rama | Nombre identificable del contenedor Docker (sage: `jupyter-sage`, statistics: `jupyter-stats`, sage-statistics: `jupyter-sage-statistics`). |
 | `GIT_REPOS` | URL/URLs | Vacío (opcional) | Repositorio(s) Git a clonar automáticamente en `/home/jupyter/work`. Múltiples repos separados por comas sin espacios. Ejemplo: `https://github.com/user/repo1,https://github.com/user/repo2` |
+| `SHOW_ALL_IPS`   | Booleano / Texto | Vacío      | Si se establece, muestra todas las direcciones IP de la máquina además de `localhost` y `127.0.0.1`. Por defecto, solo se muestran las direcciones locales. |
 
 **Rama SageMath:**
 ```bash

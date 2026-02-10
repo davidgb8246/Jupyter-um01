@@ -41,11 +41,11 @@ for ((i=1; i<=MAX_RETRIES; i++)); do
     echo "      > http://localhost:${APP_PORT}"
     echo "      > http://127.0.0.1:${APP_PORT}"
 
-    for ip in $(hostname -I); do
-      if [[ $ip != *:* ]]; then
-        echo "      > http://${ip}:${APP_PORT}"
-      fi
-    done
+    if [[ -n "${SHOW_ALL_IPS}" ]]; then
+      for ip in $(hostname -I); do
+        [[ $ip != *:* ]] && echo "      > http://${ip}:${APP_PORT}"
+      done
+    fi
 
     exit 0
   }
